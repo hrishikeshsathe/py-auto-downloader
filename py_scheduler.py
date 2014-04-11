@@ -62,7 +62,7 @@ magnet = parser.torrents[0]
 #start application associated with magnet eg bitcomet,utorrent
 os.startfile(magnet)
 shell = win32com.client.Dispatch('WScript.Shell')
-time.sleep(5)
+time.sleep(7)
 
 #send an Enter key to the bitcomet to start the download
 shell.SendKeys("{Enter}",0) 
