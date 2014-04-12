@@ -8,14 +8,19 @@ from html.parser import HTMLParser
 
 #Class to parse the torrent sites and retrieve magnet links
 class MyHTMLParser(HTMLParser):
-    torrents=[]
-    
+    magnet = ""
+    urls = []
     #function to retrieve magnet link by checking the a href tags
     def handle_starttag(self, tag, attrs):
         if tag=='a':
             for name,value in attrs:
-                if name=='href' and value[0:7]=='magnet:':
-                    self.torrents.append(value)
+                if name=='href':
+                    if value[0:7]=='magnet:':
+                        self.magnet = value
+                    elif value.find('1337x')!=-1:
+                        self.urls.append(value)
+                    elif value.find('kickass.to')!=-1:
+                        self.urls.append(value)
 #end of class
 
 
@@ -46,23 +51,20 @@ search_url = "http://torrentz.in/" + match_pattern("[a-zA-Z0-9]{40}",main_conten
 #the main_content will now contain the page for torrent specific links i.e. links for a particular torrent such as 1337x h33t kickass etc
 main_content = get_content(search_url)
 
-#bunch of if-else-ifs to find whether the popular torrent sites are available. for the first match it redirects to that website
-if main_content.find("1337x")!=-1:
-    search_url = match_pattern("http://1337x.org/torrent/[0-9]{6}/0/",main_content)
-elif main_content.find("kickass.to")!=-1:
-    search_url = match_pattern("http://kickass.to/",main_content)
+#used the parser to find out if torrent is available at popular and trusted sites
+parser.feed(main_content)
+
     
 #the main content will now contain the actual webpage where the magnet is found
-main_content = get_content(search_url)
+main_content = get_content(parser.urls[0])
 
 #feed the parser the webpage to find the magnet
 parser.feed(main_content)
-magnet = parser.torrents[0]
 
 #start application associated with magnet eg bitcomet,utorrent
-os.startfile(magnet)
+os.startfile(parser.magnet)
 shell = win32com.client.Dispatch('WScript.Shell')
 time.sleep(7)
 
 #send an Enter key to the bitcomet to start the download
-shell.SendKeys("{Enter}",0) 
+shell.SendKeys("{Enter}",0)
