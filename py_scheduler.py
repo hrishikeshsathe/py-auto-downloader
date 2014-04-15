@@ -43,17 +43,16 @@ search_url = "http://torrentz.in/search?f="+user_input
 
 #get content of the torrent search results
 main_content = get_content(search_url)
+index = main_content.find('peers')
 
 #all of the torrent links on the search results page for torrentz.in are in the for of '/40alphanumerics hence the regex to match 
 #and retrieve the first match as it is the one with highest peers
-search_url = "http://torrentz.in/" + match_pattern("[a-zA-Z0-9]{40}",main_content)
-
+search_url = "http://torrentz.in/" + match_pattern("[a-zA-Z0-9]{40}",main_content[index:-1])
 #the main_content will now contain the page for torrent specific links i.e. links for a particular torrent such as 1337x h33t kickass etc
 main_content = get_content(search_url)
 
 #used the parser to find out if torrent is available at popular and trusted sites
 parser.feed(main_content)
-
     
 #the main content will now contain the actual webpage where the magnet is found
 main_content = get_content(parser.urls[0])
