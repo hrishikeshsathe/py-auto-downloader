@@ -34,12 +34,37 @@ def match_pattern(pattern,content):
     matches = re.search(pattern,content)
     return matches.group()
 
+#function to prompt the user for show name. show name should be as precise as possible with episode or season number. for example 'chuck season 1'
+def get_user_input():
+    user_input = input("Please enter the show name you want to schedule a download for:")
+    print(user_input)
+    file = open("showname.txt","w")
+    file.write("Show Name : "+user_input)
+    file.close()
+    return user_input
 
+
+show_name = ""
 parser = MyHTMLParser()
 
-#prompt the user for show name. show name should be as precise as possible with episode or season number. for example 'chuck season 1'
-user_input = input("Please enter the show name you want to schedule a download for:") 
-search_url = "http://torrentz.in/search?f="+user_input
+try:
+    file = open("showname.txt","r")
+    file_content = file.readline()
+    if file_content != 'Show Name : 0':
+        index = file_content.find(':')
+        show_name = file_content[index+2:]
+    else:
+        file.close()
+        show_name = get_user_input()
+        
+        
+except FileNotFoundError:
+    file = open("showname.txt","w")
+    file.write("Show Name : 0")
+    file.close()
+    
+print(show_name+" asdas")
+search_url = "http://torrentz.in/search?f="+show_name
 
 #get content of the torrent search results
 main_content = get_content(search_url)
@@ -61,9 +86,9 @@ main_content = get_content(parser.urls[0])
 parser.feed(main_content)
 
 #start application associated with magnet eg bitcomet,utorrent
-os.startfile(parser.magnet)
+#os.startfile(parser.magnet)
 shell = win32com.client.Dispatch('WScript.Shell')
 time.sleep(7)
 
 #send an Enter key to the bitcomet to start the download
-shell.SendKeys("{Enter}",0)
+#shell.SendKeys("{Enter}",0)
