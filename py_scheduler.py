@@ -63,7 +63,7 @@ except FileNotFoundError:
     file.write("Show Name : 0")
     file.close()
     
-print(show_name+" asdas")
+
 search_url = "http://torrentz.in/search?f="+show_name
 
 #get content of the torrent search results
@@ -86,9 +86,9 @@ main_content = get_content(parser.urls[0])
 parser.feed(main_content)
 
 #start application associated with magnet eg bitcomet,utorrent
-#os.startfile(parser.magnet)
+os.startfile(parser.magnet)
 shell = win32com.client.Dispatch('WScript.Shell')
 time.sleep(7)
 
 #send an Enter key to the bitcomet to start the download
-#shell.SendKeys("{Enter}",0)
+shell.SendKeys("{Enter}",0)
