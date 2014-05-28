@@ -6,20 +6,21 @@ import time
 from html.parser import HTMLParser
 
 
-#Class to parse the torrent sites and retrieve magnet links
+#class to parse the torrent sites and retrieve magnet links
 class MyHTMLParser(HTMLParser):
     magnet = ""
     urls = []
+
     #function to retrieve magnet link by checking the a href tags
     def handle_starttag(self, tag, attrs):
-        if tag=='a':
-            for name,value in attrs:
-                if name=='href':
-                    if value[0:7]=='magnet:':
+        if tag == 'a':
+            for name, value in attrs:
+                if name == 'href':
+                    if value[0:7] == 'magnet:':
                         self.magnet = value
-                    elif value.find('1337x')!=-1:
+                    elif value.find('1337x') != -1:
                         self.urls.append(value)
-                    elif value.find('kickass.to')!=-1:
+                    elif value.find('kickass.to') != -1:
                         self.urls.append(value)
 #end of class
 
@@ -29,16 +30,21 @@ def get_content(url):
     r = requests.get(url)
     return r.text
 
+
 #general function for matching a pattern and returning the first match
-def match_pattern(pattern,content):
-    matches = re.search(pattern,content)
+def match_pattern(pattern, content):
+    matches = re.search(pattern, content)
     return matches.group()
 
-#function to prompt the user for show name. show name should be as precise as possible with episode or season number. for example 'chuck season 1'
+
+#function to prompt the user for show name.
+#show name should be as precise as possible with episode or season number.
+#for example 'chuck season 1'
 def get_user_input():
-    user_input = input("Please enter the show name you want to schedule a download for:")
+    user_input = input('''Please enter the show name you
+                        want to schedule a download for:''')
     print(user_input)
-    file = open("showname.txt","w")
+    file = open("showname.txt", "w")
     file.write("Show Name : "+user_input)
     file.close()
     return user_input
@@ -48,7 +54,7 @@ show_name = ""
 parser = MyHTMLParser()
 
 try:
-    file = open("showname.txt","r")
+    file = open("showname.txt", "r")
     file_content = file.readline()
     if file_content != 'Show Name : 0':
         index = file_content.find(':')
@@ -56,13 +62,13 @@ try:
     else:
         file.close()
         show_name = get_user_input()
-        
-        
+
+
 except FileNotFoundError:
-    file = open("showname.txt","w")
+    file = open("showname.txt", "w")
     file.write("Show Name : 0")
     file.close()
-    
+
 
 search_url = "http://torrentz.in/search?f="+show_name
 
@@ -70,15 +76,18 @@ search_url = "http://torrentz.in/search?f="+show_name
 main_content = get_content(search_url)
 index = main_content.find('peers')
 
-#all of the torrent links on the search results page for torrentz.in are in the for of '/40alphanumerics hence the regex to match 
+#all of the torrent links on the search results page for torrentz.in
+#are in the for of '/40alphanumerics hence the regex to match
 #and retrieve the first match as it is the one with highest peers
-search_url = "http://torrentz.in/" + match_pattern("[a-zA-Z0-9]{40}",main_content[index:-1])
-#the main_content will now contain the page for torrent specific links i.e. links for a particular torrent such as 1337x h33t kickass etc
+search_url = "http://torrentz.in/" + match_pattern("[a-zA-Z0-9]{40}",
+                                                   main_content[index:-1])
+#the main_content will now contain the page for torrent specific links i.e.
+#links for a particular torrent such as 1337x h33t kickass etc
 main_content = get_content(search_url)
 
-#used the parser to find out if torrent is available at popular and trusted sites
+#used the parser to find out if torrent is available at trusted sites
 parser.feed(main_content)
-    
+
 #the main content will now contain the actual webpage where the magnet is found
 main_content = get_content(parser.urls[0])
 
@@ -91,4 +100,4 @@ shell = win32com.client.Dispatch('WScript.Shell')
 time.sleep(7)
 
 #send an Enter key to the bitcomet to start the download
-shell.SendKeys("{Enter}",0)
+shell.SendKeys("{Enter}", 0)
