@@ -22,6 +22,12 @@ class MyHTMLParser(HTMLParser):
                         self.urls.append(value)
                     elif value.find('kickass.to') != -1:
                         self.urls.append(value)
+                    elif value.find('thepiratebay.org') != -1:
+                        self.urls.append(value)
+                    elif value.find('h33t.to') != -1:
+                        self.urls.append(value)
+                    elif value.find('torrentreactor.net') != -1:
+                        self.urls.append(value)
 #end of class
 
 
