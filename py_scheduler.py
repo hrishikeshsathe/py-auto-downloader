@@ -3,6 +3,7 @@ import re
 import os
 import win32com.client
 import time
+import sys
 from html.parser import HTMLParser
 
 
@@ -42,38 +43,20 @@ def match_pattern(pattern, content):
     matches = re.search(pattern, content)
     return matches.group()
 
-
-#function to prompt the user for show name.
-#show name should be as precise as possible with episode or season number.
-#for example 'chuck season 1'
-def get_user_input():
-    user_input = input('''Please enter the show name you
-                        want to schedule a download for:''')
-    print(user_input)
-    file = open("showname.txt", "w")
-    file.write("Show Name : "+user_input)
-    file.close()
-    return user_input
-
-
 show_name = ""
 parser = MyHTMLParser()
 
 try:
     file = open("showname.txt", "r")
     file_content = file.readline()
-    if file_content != 'Show Name : 0':
-        index = file_content.find(':')
-        show_name = file_content[index+2:]
-    else:
-        file.close()
-        show_name = get_user_input()
-
+    index = file_content.find(':')
+    show_name = file_content[index+2:]
+    file.close()
 
 except FileNotFoundError:
-    file = open("showname.txt", "w")
-    file.write("Show Name : 0")
-    file.close()
+    print('Please use user_input.py to specify the torrent you wish to download.')
+    time.sleep(10)
+    sys.exit()
 
 
 search_url = "http://torrentz.in/search?f="+show_name
